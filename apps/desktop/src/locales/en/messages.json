@@ -614,6 +614,9 @@
       }
     }
   },
+  "confirmWebauthnInBrowser": {
+    "message": "Confirm your Webauthn Key in your Browser"
+  },
   "rememberMe": {
     "message": "Remember me"
   },

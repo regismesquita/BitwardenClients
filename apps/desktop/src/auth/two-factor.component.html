@@ -64,9 +64,14 @@
       </div>
     </ng-container>
     <ng-container *ngIf="selectedProviderType === providerType.WebAuthn">
-      <div id="web-authn-frame">
-        <iframe id="webauthn_iframe" sandbox="allow-scripts allow-same-origin"></iframe>
-      </div>
+      <ng-container *ngIf="!needsWebauthnConnectorFallback">
+        <div id="web-authn-frame">
+          <iframe id="webauthn_iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="needsWebauthnConnectorFallback">
+        <p>{{ "confirmWebauthnInBrowser" | i18n }}</p>
+      </ng-container>
       <div class="box first">
         <div class="box-content">
           <div class="box-content-row box-content-row-checkbox" appBoxRow>
