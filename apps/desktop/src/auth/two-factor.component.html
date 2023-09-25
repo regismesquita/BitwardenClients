@@ -130,13 +130,24 @@
         *ngIf="
           selectedProviderType != null &&
           selectedProviderType !== providerType.Duo &&
-          selectedProviderType !== providerType.OrganizationDuo
+          selectedProviderType !== providerType.OrganizationDuo &&
+          (selectedProviderType !== providerType.WebAuthn || !needsWebauthnConnectorFallback)
         "
       >
         <span [hidden]="form.loading"
           ><i class="bwi bwi-sign-in" aria-hidden="true"></i> {{ "continue" | i18n }}</span
         >
         <i class="bwi bwi-spinner bwi-spin" [hidden]="!form.loading" aria-hidden="true"></i>
+      </button>
+      <button
+        class="btn primary block"
+        icon="bwi-external-link"
+        appStopClick
+        *ngIf="selectedProviderType === providerType.WebAuthn && needsWebauthnConnectorFallback"
+        (click)="launchWebauthnBrowser()"
+      >
+        <i class="bwi bwi-lg" aria-hidden="true" ngClass="bwi-external-link"></i>
+        Launch browser
       </button>
       <button type="button" routerLink="/login" class="btn block">{{ "cancel" | i18n }}</button>
     </div>

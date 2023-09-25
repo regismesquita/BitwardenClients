@@ -91,16 +91,6 @@ export class TwoFactorComponent extends BaseTwoFactorComponent {
     };
   }
 
-  async ngOnInit(): Promise<void> {
-    await super.ngOnInit();
-    if (
-      this.selectedProviderType == TwoFactorProviderType.WebAuthn &&
-      this.needsWebauthnConnectorFallback
-    ) {
-      this.launchWebauthnBrowser();
-    }
-  }
-
   async anotherMethod() {
     const [modal, childComponent] = await this.modalService.openViewRef(
       TwoFactorOptionsComponent,
@@ -121,11 +111,11 @@ export class TwoFactorComponent extends BaseTwoFactorComponent {
       modal.close();
       this.selectedProviderType = provider;
       if (
-        this.selectedProviderType == TwoFactorProviderType.WebAuthn &&
-        this.needsWebauthnConnectorFallback
+        !(
+          this.selectedProviderType == TwoFactorProviderType.WebAuthn &&
+          this.needsWebauthnConnectorFallback
+        )
       ) {
-        await this.launchWebauthnBrowser();
-      } else {
         await this.init();
       }
     });
