@@ -615,7 +615,7 @@
     }
   },
   "confirmWebauthnInBrowser": {
-    "message": "Confirm your Webauthn Key in your Browser"
+    "message": "To complete WebAuthn verification, launch your browser and follow the provided instructions."
   },
   "rememberMe": {
     "message": "Remember me"
