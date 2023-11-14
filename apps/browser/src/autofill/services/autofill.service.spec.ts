@@ -519,14 +519,27 @@ describe("AutofillService", () => {
     it("returns a TOTP value", async () => {
       const totpCode = "123456";
       autofillOptions.cipher.login.totp = "totp";
-      jest.spyOn(stateService, "getDisableAutoTotpCopy").mockResolvedValueOnce(false);
-      jest.spyOn(totpService, "getCode").mockReturnValueOnce(Promise.resolve(totpCode));
+      jest.spyOn(stateService, "getCanAccessPremium").mockResolvedValue(true);
+      jest.spyOn(stateService, "getDisableAutoTotpCopy").mockResolvedValue(false);
+      jest.spyOn(totpService, "getCode").mockResolvedValue(totpCode);
 
       const autofillResult = await autofillService.doAutoFill(autofillOptions);
 
       expect(stateService.getDisableAutoTotpCopy).toHaveBeenCalled();
       expect(totpService.getCode).toHaveBeenCalledWith(autofillOptions.cipher.login.totp);
       expect(autofillResult).toBe(totpCode);
+    });
+
+    it("does not return a TOTP value if the user does not have premium features", async () => {
+      autofillOptions.cipher.login.totp = "totp";
+      jest.spyOn(stateService, "getCanAccessPremium").mockResolvedValue(false);
+      jest.spyOn(stateService, "getDisableAutoTotpCopy").mockResolvedValue(false);
+
+      const autofillResult = await autofillService.doAutoFill(autofillOptions);
+
+      expect(stateService.getDisableAutoTotpCopy).not.toHaveBeenCalled();
+      expect(totpService.getCode).not.toHaveBeenCalled();
+      expect(autofillResult).toBeNull();
     });
 
     it("returns a null value if the cipher type is not for a Login", async () => {
@@ -563,11 +576,15 @@ describe("AutofillService", () => {
     it("returns a null value if the user has disabled `auto TOTP copy`", async () => {
       autofillOptions.cipher.login.totp = "totp";
       autofillOptions.cipher.organizationUseTotp = true;
-      jest.spyOn(stateService, "getCanAccessPremium").mockResolvedValueOnce(true);
-      jest.spyOn(stateService, "getDisableAutoTotpCopy").mockResolvedValueOnce(true);
+      jest.spyOn(stateService, "getCanAccessPremium").mockResolvedValue(true);
+      jest.spyOn(stateService, "getDisableAutoTotpCopy").mockResolvedValue(true);
+      jest.spyOn(totpService, "getCode");
 
       const autofillResult = await autofillService.doAutoFill(autofillOptions);
 
+      expect(stateService.getCanAccessPremium).toHaveBeenCalled();
+      expect(stateService.getDisableAutoTotpCopy).toHaveBeenCalled();
+      expect(totpService.getCode).not.toHaveBeenCalled();
       expect(autofillResult).toBeNull();
     });
   });
@@ -735,13 +752,15 @@ describe("AutofillService", () => {
         jest
           .spyOn(userVerificationService, "hasMasterPasswordAndMasterKeyHash")
           .mockResolvedValueOnce(true);
-        jest.spyOn(BrowserApi, "tabSendMessageData").mockImplementation();
+        jest
+          .spyOn(autofillService as any, "openVaultItemPasswordRepromptPopout")
+          .mockImplementation();
 
         const result = await autofillService.doAutoFillOnTab(pageDetails, tab, true);
 
         expect(cipherService.getNextCipherForUrl).toHaveBeenCalledWith(tab.url);
         expect(userVerificationService.hasMasterPasswordAndMasterKeyHash).toHaveBeenCalled();
-        expect(BrowserApi.tabSendMessageData).toHaveBeenCalledWith(tab, "passwordReprompt", {
+        expect(autofillService["openVaultItemPasswordRepromptPopout"]).toHaveBeenCalledWith(tab, {
           cipherId: cipher.id,
           action: "autofill",
         });
@@ -778,6 +797,18 @@ describe("AutofillService", () => {
           }),
         },
       ];
+    });
+
+    it("returns a null vault without doing autofill if the page details does not contain fields ", async () => {
+      pageDetails[0].details.fields = [];
+      jest.spyOn(autofillService as any, "getActiveTab");
+      jest.spyOn(autofillService, "doAutoFill");
+
+      const result = await autofillService.doAutoFillActiveTab(pageDetails, false);
+
+      expect(autofillService["getActiveTab"]).not.toHaveBeenCalled();
+      expect(autofillService.doAutoFill).not.toHaveBeenCalled();
+      expect(result).toBeNull();
     });
 
     it("returns a null value without doing autofill if the active tab cannot be found", async () => {
@@ -4223,6 +4254,26 @@ describe("AutofillService", () => {
       const result = AutofillService.forCustomFieldsOnly(field);
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe("isDebouncingPasswordRepromptPopout", () => {
+    it("returns false and sets up the debounce if a master password reprompt window is not currently opening", () => {
+      jest.spyOn(globalThis, "setTimeout");
+
+      const result = autofillService["isDebouncingPasswordRepromptPopout"]();
+
+      expect(result).toBe(false);
+      expect(globalThis.setTimeout).toHaveBeenCalledWith(expect.any(Function), 100);
+      expect(autofillService["currentlyOpeningPasswordRepromptPopout"]).toBe(true);
+    });
+
+    it("returns true if a master password reprompt window is currently opening", () => {
+      autofillService["currentlyOpeningPasswordRepromptPopout"] = true;
+
+      const result = autofillService["isDebouncingPasswordRepromptPopout"]();
+
+      expect(result).toBe(true);
     });
   });
 });

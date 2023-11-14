@@ -508,9 +508,6 @@
   "maxFileSize": {
     "message": "Maksimal fayl həcmi 500 MB-dır."
   },
-  "updateKey": {
-    "message": "Şifrələmə açarınızı güncəlləyənə qədər bu özəlliyi istifadə edə bilməzsiniz."
-  },
   "addedItem": {
     "message": "Element əlavə edildi"
   },
@@ -613,6 +610,87 @@
   },
   "loginWithMasterPassword": {
     "message": "Ana parolla giriş et"
+  },
+  "loginWithPasskey": {
+    "message": "Parolla giriş et"
+  },
+  "loginWithPasskeyInfo": {
+    "message": "Bir parol olmadan avtomatik olaraq giriş etməyinizi təmin edəcək bir keçid açarı istifadə edin. Üz tanıma və ya barmaq izi kimi biometrik, ya da başqa bir FIDO2 güvənlik üsulu kimliyinizi doğrulayacaq."
+  },
+  "newPasskey": {
+    "message": "Yeni parol"
+  },
+  "learnMoreAboutPasswordless": {
+    "message": "Parolsuz haqqında daha ətraflı"
+  },
+  "passkeyEnterMasterPassword": {
+    "message": "Parol ayarlarına sahib girişi dəyişdirmək üçün ana parolunuzu daxil edin."
+  },
+  "creatingPasskeyLoading": {
+    "message": "Keçid açarı yaradılır..."
+  },
+  "creatingPasskeyLoadingInfo": {
+    "message": "Bu pəncərəni açıq saxlayın və brauzerinizdən gələn sorğuları izləyin."
+  },
+  "errorCreatingPasskey": {
+    "message": "Keçid açarının yaradılma xətası"
+  },
+  "errorCreatingPasskeyInfo": {
+    "message": "Keçid açarınız yaradılarkən bir problem yarandı."
+  },
+  "passkeySuccessfullyCreated": {
+    "message": "Keçid açarı uğurla yaradıldı!"
+  },
+  "customName": {
+    "message": "Özəl ad"
+  },
+  "customPasskeyNameInfo": {
+    "message": "Müəyyənləşdirməyə kömək etmək üçün keçid açarınızı adlandırın."
+  },
+  "useForVaultEncryption": {
+    "message": "Kassa şifrələməsi üçün istifadə et"
+  },
+  "useForVaultEncryptionInfo": {
+    "message": "Dəstəklənən cihazlarda ana parolunuz olmadan giriş edin və kilidi açın. Quraşdırmanı tamamlamaq üçün təlimatları izləyin."
+  },
+  "useForVaultEncryptionErrorReadingPasskey": {
+    "message": "Keçid açarı oxunarkən xəta baş verdi. Yenidən sınayın və ya bu seçimi ləğv edin."
+  },
+  "encryptionNotSupported": {
+    "message": "Şifrələmə dəstəklənmir"
+  },
+  "encryptionNotEnabled": {
+    "message": "Şifrələmə fəal deyil"
+  },
+  "usedForEncryption": {
+    "message": "Şifrələmə üçün istifadə edilir"
+  },
+  "loginWithPasskeyEnabled": {
+    "message": "Keçid açarı işlək olduqda giriş edin"
+  },
+  "passkeySaved": {
+    "message": "$NAME$ saxlanıldı",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Personal yubikey"
+      }
+    }
+  },
+  "passkeyRemoved": {
+    "message": "Parol silindi"
+  },
+  "removePasskey": {
+    "message": "Parolu sil"
+  },
+  "removePasskeyInfo": {
+    "message": "Bütün keçid açarları silinsə, ana parolunuz olmadan yeni cihazlarda giriş edə bilməzsiniz."
+  },
+  "passkeyLimitReachedInfo": {
+    "message": "Keçid açarı limitinə çatıldı. Başqasını əlavə etmək üçün bir keçid açarı silin."
+  },
+  "tryAgain": {
+    "message": "Yenidən sına"
   },
   "createAccount": {
     "message": "Hesab yarat"
@@ -1482,6 +1560,9 @@
   "manage": {
     "message": "İdarə et"
   },
+  "canManage": {
+    "message": "İdarə edə bilər"
+  },
   "disable": {
     "message": "Sıradan çıxart"
   },
@@ -2214,6 +2295,9 @@
   "contactSupport": {
     "message": "Müştəri dəstəyi ilə əlaqə"
   },
+  "contactSupportShort": {
+    "message": "Dəstəklə əlaqə"
+  },
   "updatedPaymentMethod": {
     "message": "Ödəniş metodu güncəlləndi."
   },
@@ -2314,6 +2398,9 @@
   },
   "planDescTeams": {
     "message": "Biznes və digər komanda təşkilatları üçün."
+  },
+  "planNameTeamsStarter": {
+    "message": "Teams Starter"
   },
   "planNameEnterprise": {
     "message": "Müəssisə"
@@ -2674,6 +2761,9 @@
   },
   "webVault": {
     "message": "Veb anbar"
+  },
+  "cli": {
+    "message": "CLI"
   },
   "bitWebVault": {
     "message": "Bitwarden Web anbarı"
@@ -3398,6 +3488,9 @@
   "subscriptionUpdated": {
     "message": "Abunəlik güncəlləndi"
   },
+  "subscribedToSecretsManager": {
+    "message": "Abunəlik güncəlləndi. Artıq \"Secrets Menecer\"ə müraciətiniz var."
+  },
   "additionalOptions": {
     "message": "Əlavə seçimlər"
   },
@@ -3413,6 +3506,15 @@
       "max": {
         "content": "$1",
         "example": "50"
+      }
+    }
+  },
+  "subscriptionUserSeatsWithoutAdditionalSeatsOption": {
+    "message": "Heç bir əlavə ödəniş etmədən $COUNT$ ədədə qədər üzv dəvət edə bilərsiniz. Planınızı yüksəltmək və daha çox üzv dəvət etmək üçün Müştəri Dəstəyi ilə əlaqə saxlayın.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "10"
       }
     }
   },
@@ -3476,17 +3578,11 @@
   "keyUpdated": {
     "message": "Açar güncəlləndi"
   },
-  "updateKeyTitle": {
-    "message": "Açarı güncəllə"
-  },
   "updateEncryptionKey": {
     "message": "Şifrələmə açarını güncəllə"
   },
-  "updateEncryptionKeyShortDesc": {
-    "message": "Hal-hazırda köhnə bir şifrələmə sxemi istifadə edirsiniz."
-  },
-  "updateEncryptionKeyDesc": {
-    "message": "Daha yaxşı güvənlik və daha yeni özəlliklərə müraciəti təmin edən daha böyük şifrələmə açarlarına keçdik. Şifrələmə açarınızı güncəlləmək sürətli və asandır. Sadəcə aşağıda ana parolunuzu yazın. Bu güncəlləmə, nəticədə məcburi olacaq."
+  "updateEncryptionSchemeDesc": {
+    "message": "Daha yaxşı güvənlik təqdim etmək üçün şifrələmə sxemini dəyişdirdik. Ana parolunuzu aşağıda daxil edərək şifrələmə açarınızı güncəlləyin."
   },
   "updateEncryptionKeyWarning": {
     "message": "Şifrələmə açarını güncəllədikdən sonra, hazırda istifadə etdiyiniz (mobil tətbiq və ya brauzer genişləndirmələri kimi) bütün Bitwarden tətbiqlərində çıxış edib yenidən giriş etməlisiniz. Çıxış edib təkrar giriş etməmək (yeni şifrələmə açarının endirilməsi prosesi) verilənlərin zədələnməsi ilə nəticələnə bilər. Avtomatik olaraq çıxış etməyə çalışacağıq, bu gecikə bilər."
@@ -3581,6 +3677,18 @@
   "organizationIsDisabled": {
     "message": "Təşkilat sıradan çıxarıldı."
   },
+  "secretsAccessSuspended": {
+    "message": "Dayandırılmış təşkilatlara müraciət edilə bilməz. Lütfən kömək üçün təşkilatınızın sahibi ilə əlaqə saxlayın."
+  },
+  "secretsCannotCreate": {
+    "message": "Secrets cannot be created in suspended organizations. Please contact your organization owner for assistance."
+  },
+  "projectsCannotCreate": {
+    "message": "Layihələr dayandırılmış təşkilatlarda yaradıla bilməz. Lütfən kömək üçün təşkilatınızın sahibi ilə əlaqə saxlayın."
+  },
+  "serviceAccountsCannotCreate": {
+    "message": "Xidmət hesabları dayandırılmış təşkilatlarda yaradıla bilməz. Lütfən kömək üçün təşkilatınızın sahibi ilə əlaqə saxlayın."
+  },
   "disabledOrganizationFilterError": {
     "message": "Sıradan çıxarılmış Təşkilatlardakı elementlərə müraciət edilə bilmir. Kömək üçün Təşkilatınızın sahibi ilə əlaqə saxlayın."
   },
@@ -3634,7 +3742,7 @@
     "message": "Bu element, düzəldilməli köhnə fayl qoşmalarını ehtiva edir."
   },
   "attachmentFixDescription": {
-    "message": "This attachment uses outdated encryption. Select 'Fix' to download, re-encrypt, and re-upload the attachment."
+    "message": "Bu qoşma güncəl olmayan şifrələmə istifadə edir. Qoşmanı endirmək, təkrar şifrələmək və təkrar yükləmək üçün \"Düzəlt\"i seçin."
   },
   "fix": {
     "message": "Düzəlt",
@@ -3890,9 +3998,6 @@
   "setMasterPassword": {
     "message": "Ana parolu tənzimlə"
   },
-  "ssoCompleteRegistration": {
-    "message": "SSO ilə giriş prosesini tamamlamaq üçün zəhmət olmasa anbarınıza müraciət etmək və onu qorumaq üçün bir ana parol tənzimləyin."
-  },
   "identifier": {
     "message": "İdentifikator"
   },
@@ -3911,6 +4016,21 @@
   "includeAllTeamsFeatures": {
     "message": "Bütün komanda özəllikləri, əlavə olaraq:"
   },
+  "includeAllTeamsStarterFeatures": {
+    "message": "Bütün Teams Starter özəllikləri, əlavə olaraq:"
+  },
+  "chooseMonthlyOrAnnualBilling": {
+    "message": "Aylıq və ya illik fakturanı seçin"
+  },
+  "abilityToAddMoreThanNMembers": {
+    "message": "$COUNT$+ üzv əlavə etmə imkanı",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "10"
+      }
+    }
+  },
   "includeSsoAuthentication": {
     "message": "SAML2.0 və OpenID Connect SSO Kimlik təsdiqləmə"
   },
@@ -3926,8 +4046,9 @@
   "ssoIdentifier": {
     "message": "SSO identifikatoru"
   },
-  "ssoIdentifierHint": {
-    "message": "SSO ilə giriş etmələri üçün bu kimliyi üzvlərinizə təqdim edin."
+  "ssoIdentifierHintPartOne": {
+    "message": "SSO ilə giriş etmələri üçün üzvlərinizi bu kimliklə təmin edin. Bu addımı ötürmək üçün, quraşdırın ",
+    "description": "This will be used as part of a larger sentence, broken up to include links. The full sentence will read 'Provide this ID to your members to login with SSO. To bypass this step, set up Domain verification'"
   },
   "unlinkSso": {
     "message": "SSO əlaqəsini kəs"
@@ -4622,10 +4743,10 @@
     "message": "Şifrələmə üsuluna əsasən, ana parollar və güvənilən cihazlar unudulduqda və ya itirildikdə hesabları bərpa edin."
   },
   "accountRecoveryPolicyWarning": {
-    "message": "Existing accounts with master passwords will require members to self-enroll before administrators can recover their accounts. Automatic enrollment will turn on account recovery for new members."
+    "message": "Ana parolları olan mövcud hesablar, administratorların öz hesablarını bərpa edə bilməsindən əvvəl üzvlərin öz-özünə yazılmalarını tələb edəcək. Avto-yazılma, yeni üzvlər üçün hesab bərpasını işə salacaq."
   },
   "accountRecoverySingleOrgRequirementDesc": {
-    "message": "The single organization Enterprise policy must be turned on before activating this policy."
+    "message": "Bu siyasət aktivləşdirilməzdən əvvəl, \"Tək təşkilat\" Müəssisə siyasəti işə salınmalıdır."
   },
   "resetPasswordPolicyAutoEnroll": {
     "message": "Avtomatik qeydiyyat"
@@ -4730,7 +4851,7 @@
     "message": "Xəta"
   },
   "accountRecoveryManageUsers": {
-    "message": "Manage users must also be granted with the manage account recovery permission"
+    "message": "\"Hesab bərpasını idarə et\" icazəsi ilə birgə \"İstifadəçiləri idarə et\"ə icazə verilməlidir"
   },
   "setupProvider": {
     "message": "Provayder quraşdırması"
@@ -4942,7 +5063,7 @@
     "message": "Fərdi anbarın ixracını sıradan çıxart"
   },
   "disablePersonalVaultExportDescription": {
-    "message": "Do not allow members to export data from their individual vault."
+    "message": "Üzvlərin öz anbarlarından datanı xaricə köçürməsinə icazə verməyin."
   },
   "vaultExportDisabled": {
     "message": "Anbar ixracı sıradan çıxarıldı"
@@ -5246,7 +5367,7 @@
     "description": "This will be used as part of a larger sentence, broken up to include links. The full sentence will read 'Use the require single-sign-on authentication policy to require all members to log in with SSO.'"
   },
   "ssoPolicyHelpAnchor": {
-    "message": "require single sign-on authentication policy",
+    "message": "tək daxil olma kimlik təsdiqləmə siyasətini tələb et",
     "description": "This will be used as part of a larger sentence, broken up to include links. The full sentence will read 'Use the require single-sign-on authentication policy to require all members to log in with SSO.'"
   },
   "ssoPolicyHelpEnd": {
@@ -5415,6 +5536,19 @@
   "required": {
     "message": "tələb olunur"
   },
+  "charactersCurrentAndMaximum": {
+    "message": "$CURRENT$/$MAX$ simvol",
+    "placeholders": {
+      "current": {
+        "content": "$1",
+        "example": "0"
+      },
+      "max": {
+        "content": "$2",
+        "example": "100"
+      }
+    }
+  },
   "characterMaximum": {
     "message": "maksimum $MAX$ simvol",
     "placeholders": {
@@ -5446,7 +5580,7 @@
     "message": "Təşkilat anbarının ixracı"
   },
   "exportingIndividualVaultDescription": {
-    "message": "Only the individual vault items associated with $EMAIL$ will be exported. Organization vault items will not be included. Only vault item information will be exported and will not include associated attachments.",
+    "message": "Yalnız $EMAIL$ ilə əlaqələndirilmiş fərdi anbar elementləri xaricə köçürüləcək. Təşkilat anbar elementləri daxil edilməyəcək. Yalnız anbar element məlumatları xaricə köçürüləcək və əlaqələndirilmiş qoşmalar daxil edilməyəcək.",
     "placeholders": {
       "email": {
         "content": "$1",
@@ -5762,6 +5896,9 @@
   },
   "on": {
     "message": "Açıqdır"
+  },
+  "off": {
+    "message": "Bağlı"
   },
   "members": {
     "message": "Üzvlər"
@@ -6509,6 +6646,24 @@
       }
     }
   },
+  "teamsStarterPlanInvLimitReachedManageBilling": {
+    "message": "Teams Starter planlarında ən çox $SEATCOUNT$ üzv ola bilər. Planınızı yüksəltmək və daha çox üzv dəvət etmək üçün Müştəri Dəstəyi ilə əlaqə saxlayın.",
+    "placeholders": {
+      "seatcount": {
+        "content": "$1",
+        "example": "10"
+      }
+    }
+  },
+  "teamsStarterPlanInvLimitReachedNoManageBilling": {
+    "message": "Teams Starter planlarında ən çox $SEATCOUNT$ üzv ola bilər. Planınızı yüksəltmək və daha çox üzv dəvət etmək üçün təşkilatınızın sahibi ilə əlaqə saxlayın.",
+    "placeholders": {
+      "seatcount": {
+        "content": "$1",
+        "example": "10"
+      }
+    }
+  },
   "freeOrgMaxCollectionReachedManageBilling": {
     "message": "Ödənişsiz təşkilatların ən çox $COLLECTIONCOUNT$ kolleksiyası ola bilər. Daha çox kolleksiya əlavə etmək üçün ödənişli bir plana yüksəldin.",
     "placeholders": {
@@ -6651,7 +6806,7 @@
     "message": "\"Secrets Manager\"ə istifadəçi müraciətini aktivləşdir."
   },
   "userAccessSecretsManagerGA": {
-    "message": "This user can access Secrets Manager"
+    "message": "Bu istifadəçi \"Secrets Manager\"ə müraciət edə bilər"
   },
   "important": {
     "message": "Vacib:"
@@ -6899,6 +7054,14 @@
     "message": "bu seçim istifadə edildikdə avto-qeydiyyat ilə işə salınacaq.",
     "description": "This will be used as part of a larger sentence, broken up to include links. The full sentence will read 'Once authenticated, members will decrypt vault data using a key stored on their device. The single organization policy, SSO required policy, and account recovery administration policy with automatic enrollment will turn on when this option is used.'"
   },
+  "orgPermissionsUpdatedMustSetPassword": {
+    "message": "Təşkilatınızın icazələri güncəlləndi və bir ana parol ayarlamağınızı tələb edir.",
+    "description": "Used as a card title description on the set password page to explain why the user is there"
+  },
+  "orgRequiresYouToSetPassword": {
+    "message": "Təşkilatınız bir ana parol ayarlamağı tələb edir.",
+    "description": "Used as a card title description on the set password page to explain why the user is there"
+  },
   "notFound": {
     "message": "$RESOURCE$ tapılmadı",
     "placeholders": {
@@ -7105,8 +7268,8 @@
       }
     }
   },
-  "addSecretsManager": {
-    "message": "Add Secrets Manager"
+  "subscribeToSecretsManager": {
+    "message": "\"Secrets Manager\"ə abunə ol"
   },
   "addSecretsManagerUpgradeDesc": {
     "message": "Add Secrets Manager to your upgraded plan to maintain access to any secrets created with your previous plan."
@@ -7131,6 +7294,18 @@
         "example": "$0.50"
       }
     }
+  },
+  "collectionManagement": {
+    "message": "Kolleksiya idarəetməsi"
+  },
+  "collectionManagementDesc": {
+    "message": "Təşkilat üçün kolleksiya davranışını idarə et"
+  },
+  "limitCollectionCreationDeletionDesc": {
+    "message": "Kolleksiya yaradılmasını və silinməsini sahibləri və adminləri ilə məhdudlaşdır"
+  },
+  "collectionManagementUpdated": {
+    "message": "Kolleksiya idarəetmə davranışı saxlanıldı"
   },
   "passwordManagerPlanPrice": {
     "message": "Parol Meneceri plan qiyməti"
@@ -7178,7 +7353,44 @@
   "beta": {
     "message": "Beta"
   },
+  "assignCollectionAccess": {
+    "message": "Kolleksiya müraciəti təyin et"
+  },
+  "editedCollections": {
+    "message": "Düzəliş edilən kolleksiyalar"
+  },
+  "baseUrl": {
+    "message": "Server URL-si"
+  },
+  "aliasDomain": {
+    "message": "Domen ləqəbi"
+  },
   "alreadyHaveAccount": {
-    "message": "Already have an account?"
+    "message": "Artıq bir hesabınız var?"
+  },
+  "customBillingStart": {
+    "message": "Özəl faktura əks olunmur. Son faktura üçün "
+  },
+  "customBillingEnd": {
+    "message": " səhifəni ziyarət edin."
+  },
+  "managePermissionRequired": {
+    "message": "Ən azı bir üzv və ya qrup idarə edə bilmə icazəsinə sahib olmalıdır."
+  },
+  "typePasskey": {
+    "message": "Keçid açarı"
+  },
+  "passkeyNotCopied": {
+    "message": "Keçid açarı kopyalanmır"
+  },
+  "passkeyNotCopiedAlert": {
+    "message": "Keçid açarı, klonlanmış elementə kopyalanmayacaq. Bu elementi klonlamağa davam etmək istəyirsiniz?"
+  },
+  "seeDetailedInstructions": {
+    "message": "Kömək saytımızda detallı təlimatlara baxın",
+    "description": "This is followed a by a hyperlink to the help website."
+  },
+  "projectAccessUpdated": {
+    "message": "Project access updated"
   }
 }
