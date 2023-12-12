@@ -1,3 +1,22 @@
+# Branch note:
+
+This repository keeps a copy of the changes from a PR that enables fido2
+support on the mac build synced with the most recent changes on the official repo.
+
+based on https://github.com/bitwarden/clients/pull/6375
+
+To build run:
+```
+cd apps/desktop/
+npm run pack:mac
+```
+
+If you have any errors on the notorizing step it is no issue , as your dmg is already available at:
+`$PROJECT_ROOT$/apps/desktop/dist/mac-universal/Bitwarden.app`
+All you got to do is copy to `/Applications/`
+
+-------
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/bitwarden/brand/master/screenshots/apps-combo-logo.png" alt="Bitwarden" />
 </p>
