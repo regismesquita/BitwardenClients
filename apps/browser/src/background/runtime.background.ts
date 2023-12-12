@@ -6,13 +6,14 @@ import { LogService } from "@bitwarden/common/platform/abstractions/log.service"
 import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
 import { SystemService } from "@bitwarden/common/platform/abstractions/system.service";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
-import { CipherType } from "@bitwarden/common/vault/enums/cipher-type";
+import { CipherType } from "@bitwarden/common/vault/enums";
 
 import {
   closeUnlockPopout,
   openSsoAuthResultPopout,
   openTwoFactorAuthPopout,
 } from "../auth/popup/utils/auth-popout-window";
+import LockedVaultPendingNotificationsItem from "../autofill/notification/models/locked-vault-pending-notifications-item";
 import { AutofillService } from "../autofill/services/abstractions/autofill.service";
 import { BrowserApi } from "../platform/browser/browser-api";
 import { BrowserStateService } from "../platform/services/abstractions/browser-state.service";
@@ -21,7 +22,6 @@ import BrowserPlatformUtilsService from "../platform/services/browser-platform-u
 import { AbortManager } from "../vault/background/abort-manager";
 
 import MainBackground from "./main.background";
-import LockedVaultPendingNotificationsItem from "./models/lockedVaultPendingNotificationsItem";
 
 export default class RuntimeBackground {
   private autofillTimeout: any;
@@ -133,7 +133,8 @@ export default class RuntimeBackground {
       case "triggerAutofillScriptInjection":
         await this.autofillService.injectAutofillScripts(
           sender,
-          await this.configService.getFeatureFlag<boolean>(FeatureFlag.AutofillV2)
+          await this.configService.getFeatureFlag<boolean>(FeatureFlag.AutofillV2),
+          await this.configService.getFeatureFlag<boolean>(FeatureFlag.AutofillOverlay)
         );
         break;
       case "bgCollectPageDetails":
@@ -293,6 +294,9 @@ export default class RuntimeBackground {
             }
           }
         );
+      case "switchAccount": {
+        await this.main.switchAccount(msg.userId);
+      }
     }
   }
 

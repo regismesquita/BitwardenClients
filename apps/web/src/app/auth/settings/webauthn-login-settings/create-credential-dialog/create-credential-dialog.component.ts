@@ -4,11 +4,11 @@ import { FormBuilder, Validators } from "@angular/forms";
 import { firstValueFrom, map, Observable } from "rxjs";
 
 import { PrfKeySet } from "@bitwarden/auth";
+import { Verification } from "@bitwarden/common/auth/types/verification";
 import { ErrorResponse } from "@bitwarden/common/models/response/error.response";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
-import { Verification } from "@bitwarden/common/types/verification";
 import { DialogService } from "@bitwarden/components";
 
 import { WebauthnLoginAdminService } from "../../../core";
@@ -151,21 +151,12 @@ export class CreateCredentialDialogComponent implements OnInit {
     }
 
     const name = this.formGroup.value.credentialNaming.name;
-    try {
-      await this.webauthnService.saveCredential(
-        this.formGroup.value.credentialNaming.name,
-        this.pendingCredential,
-        keySet
-      );
-    } catch (error) {
-      this.logService?.error(error);
-      this.platformUtilsService.showToast(
-        "error",
-        this.i18nService.t("unexpectedError"),
-        error.message
-      );
-      return;
-    }
+
+    await this.webauthnService.saveCredential(
+      this.formGroup.value.credentialNaming.name,
+      this.pendingCredential,
+      keySet
+    );
 
     if (await firstValueFrom(this.hasPasskeys$)) {
       this.platformUtilsService.showToast(

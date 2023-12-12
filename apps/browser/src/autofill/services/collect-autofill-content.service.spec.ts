@@ -9,6 +9,7 @@ import {
   FormElementWithAttribute,
 } from "../types";
 
+import AutofillOverlayContentService from "./autofill-overlay-content.service";
 import CollectAutofillContentService from "./collect-autofill-content.service";
 import DomElementVisibilityService from "./dom-element-visibility.service";
 
@@ -23,11 +24,15 @@ const mockLoginForm = `
 
 describe("CollectAutofillContentService", () => {
   const domElementVisibilityService = new DomElementVisibilityService();
+  const autofillOverlayContentService = new AutofillOverlayContentService();
   let collectAutofillContentService: CollectAutofillContentService;
 
   beforeEach(() => {
     document.body.innerHTML = mockLoginForm;
-    collectAutofillContentService = new CollectAutofillContentService(domElementVisibilityService);
+    collectAutofillContentService = new CollectAutofillContentService(
+      domElementVisibilityService,
+      autofillOverlayContentService
+    );
   });
 
   afterEach(() => {
@@ -2045,6 +2050,83 @@ describe("CollectAutofillContentService", () => {
       expect(
         collectAutofillContentService["handleAutofillElementAttributeMutation"]
       ).not.toBeCalled();
+    });
+
+    it("will setup the overlay listeners on mutated elements", async () => {
+      jest.useFakeTimers();
+      const form = document.createElement("form");
+      document.body.appendChild(form);
+      const addedNodes = document.querySelectorAll("form");
+      const removedNodes = document.querySelectorAll("li");
+      const mutationRecord: MutationRecord = {
+        type: "childList",
+        addedNodes: addedNodes,
+        attributeName: null,
+        attributeNamespace: null,
+        nextSibling: null,
+        oldValue: null,
+        previousSibling: null,
+        removedNodes: removedNodes,
+        target: document.body,
+      };
+      collectAutofillContentService["domRecentlyMutated"] = false;
+      collectAutofillContentService["noFieldsFound"] = true;
+      collectAutofillContentService["currentLocationHref"] = window.location.href;
+      jest.spyOn(collectAutofillContentService as any, "setupOverlayListenersOnMutatedElements");
+
+      collectAutofillContentService["handleMutationObserverMutation"]([mutationRecord]);
+      jest.runAllTimers();
+
+      expect(collectAutofillContentService["setupOverlayListenersOnMutatedElements"]).toBeCalled();
+    });
+  });
+
+  describe("setupOverlayListenersOnMutatedElements", () => {
+    it("skips building the autofill field item if the node is not a form field element", () => {
+      const divElement = document.createElement("div");
+      const nodes = [divElement];
+      jest.spyOn(collectAutofillContentService as any, "buildAutofillFieldItem");
+
+      collectAutofillContentService["setupOverlayListenersOnMutatedElements"](nodes);
+
+      expect(collectAutofillContentService["buildAutofillFieldItem"]).not.toBeCalled();
+    });
+
+    it("skips building the autofill field item if the node is already a field element", () => {
+      const inputElement = document.createElement("input") as ElementWithOpId<HTMLInputElement>;
+      inputElement.setAttribute("type", "password");
+      const nodes = [inputElement];
+      collectAutofillContentService["autofillFieldElements"].set(inputElement, {
+        opid: "1234",
+      } as AutofillField);
+      jest.spyOn(collectAutofillContentService as any, "buildAutofillFieldItem");
+
+      collectAutofillContentService["setupOverlayListenersOnMutatedElements"](nodes);
+
+      expect(collectAutofillContentService["buildAutofillFieldItem"]).not.toBeCalled();
+    });
+
+    it("builds the autofill field item to ensure the overlay listeners are set", () => {
+      document.body.innerHTML = `
+        <form>
+          <label for="username-id">Username Label</label>
+          <input type="text" id="username-id">
+        </form>
+      `;
+
+      const inputElement = document.getElementById(
+        "username-id"
+      ) as ElementWithOpId<HTMLInputElement>;
+      inputElement.setAttribute("type", "password");
+      const nodes = [inputElement];
+      jest.spyOn(collectAutofillContentService as any, "buildAutofillFieldItem");
+
+      collectAutofillContentService["setupOverlayListenersOnMutatedElements"](nodes);
+
+      expect(collectAutofillContentService["buildAutofillFieldItem"]).toBeCalledWith(
+        inputElement,
+        -1
+      );
     });
   });
 

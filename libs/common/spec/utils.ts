@@ -69,6 +69,10 @@ export function trackEmissions<T>(observable: Observable<T>): T[] {
       case "boolean":
         emissions.push(value);
         break;
+      case "symbol":
+        // Cheating types to make symbols work at all
+        emissions.push(value.toString() as T);
+        break;
       default: {
         emissions.push(clone(value));
       }
@@ -82,5 +86,13 @@ function clone(value: any): any {
     return structuredClone(value);
   } else {
     return JSON.parse(JSON.stringify(value));
+  }
+}
+
+export async function awaitAsync(ms = 1) {
+  if (ms < 1) {
+    await Promise.resolve();
+  } else {
+    await new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

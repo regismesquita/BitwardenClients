@@ -1,12 +1,12 @@
 import { EventCollectionService } from "@bitwarden/common/abstractions/event/event-collection.service";
 import { SettingsService } from "@bitwarden/common/abstractions/settings.service";
-import { TotpService } from "@bitwarden/common/abstractions/totp.service";
 import { UserVerificationService } from "@bitwarden/common/auth/abstractions/user-verification/user-verification.service.abstraction";
-import { EventType, FieldType, UriMatchType } from "@bitwarden/common/enums";
+import { EventType } from "@bitwarden/common/enums";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
+import { TotpService } from "@bitwarden/common/vault/abstractions/totp.service";
+import { FieldType, UriMatchType, CipherType } from "@bitwarden/common/vault/enums";
 import { CipherRepromptType } from "@bitwarden/common/vault/enums/cipher-reprompt-type";
-import { CipherType } from "@bitwarden/common/vault/enums/cipher-type";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
 import { FieldView } from "@bitwarden/common/vault/models/view/field.view";
 
@@ -16,6 +16,7 @@ import { openVaultItemPasswordRepromptPopout } from "../../vault/popup/utils/vau
 import AutofillField from "../models/autofill-field";
 import AutofillPageDetails from "../models/autofill-page-details";
 import AutofillScript from "../models/autofill-script";
+import { AutofillOverlayVisibility } from "../utils/autofill-overlay.enum";
 
 import {
   AutoFillOptions,
@@ -52,10 +53,25 @@ export default class AutofillService implements AutofillServiceInterface {
    * is enabled.
    * @param {chrome.runtime.MessageSender} sender
    * @param {boolean} autofillV2
+   * @param {boolean} autofillOverlay
    * @returns {Promise<void>}
    */
-  async injectAutofillScripts(sender: chrome.runtime.MessageSender, autofillV2 = false) {
-    const mainAutofillScript = autofillV2 ? `autofill-init.js` : "autofill.js";
+  async injectAutofillScripts(
+    sender: chrome.runtime.MessageSender,
+    autofillV2 = false,
+    autofillOverlay = false
+  ) {
+    let mainAutofillScript = "autofill.js";
+
+    const isUsingAutofillOverlay =
+      autofillOverlay &&
+      (await this.settingsService.getAutoFillOverlayVisibility()) !== AutofillOverlayVisibility.Off;
+
+    if (autofillV2) {
+      mainAutofillScript = isUsingAutofillOverlay
+        ? "bootstrap-autofill-overlay.js"
+        : "bootstrap-autofill.js";
+    }
 
     const injectedScripts = [
       mainAutofillScript,
@@ -208,6 +224,7 @@ export default class AutofillService implements AutofillServiceInterface {
             command: "fillForm",
             fillScript: fillScript,
             url: tab.url,
+            pageDetailsUrl: pd.details.url,
           },
           { frameId: pd.frameId }
         );
@@ -275,19 +292,12 @@ export default class AutofillService implements AutofillServiceInterface {
     }
 
     if (
-      cipher.reprompt === CipherRepromptType.Password &&
-      // If the master password has is not available, reprompt will error
-      (await this.userVerificationService.hasMasterPasswordAndMasterKeyHash()) &&
+      (await this.isPasswordRepromptRequired(cipher, tab)) &&
       !this.isDebouncingPasswordRepromptPopout()
     ) {
       if (fromCommand) {
         this.cipherService.updateLastUsedIndexForUrl(tab.url);
       }
-
-      await this.openVaultItemPasswordRepromptPopout(tab, {
-        cipherId: cipher.id,
-        action: "autofill",
-      });
 
       return null;
     }
@@ -311,6 +321,21 @@ export default class AutofillService implements AutofillServiceInterface {
     }
 
     return totpCode;
+  }
+
+  async isPasswordRepromptRequired(cipher: CipherView, tab: chrome.tabs.Tab): Promise<boolean> {
+    const userHasMasterPasswordAndKeyHash =
+      await this.userVerificationService.hasMasterPasswordAndMasterKeyHash();
+    if (cipher.reprompt === CipherRepromptType.Password && userHasMasterPasswordAndKeyHash) {
+      await this.openVaultItemPasswordRepromptPopout(tab, {
+        cipherId: cipher.id,
+        action: "autofill",
+      });
+
+      return true;
+    }
+
+    return false;
   }
 
   /**

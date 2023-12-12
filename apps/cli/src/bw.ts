@@ -29,8 +29,9 @@ import { TokenService } from "@bitwarden/common/auth/services/token.service";
 import { TwoFactorService } from "@bitwarden/common/auth/services/two-factor.service";
 import { UserVerificationApiService } from "@bitwarden/common/auth/services/user-verification/user-verification-api.service";
 import { UserVerificationService } from "@bitwarden/common/auth/services/user-verification/user-verification.service";
-import { ClientType, KeySuffixOptions, LogLevelType } from "@bitwarden/common/enums";
+import { ClientType } from "@bitwarden/common/enums";
 import { ConfigApiServiceAbstraction } from "@bitwarden/common/platform/abstractions/config/config-api.service.abstraction";
+import { KeySuffixOptions, LogLevelType } from "@bitwarden/common/platform/enums";
 import { StateFactory } from "@bitwarden/common/platform/factories/state-factory";
 import { Account } from "@bitwarden/common/platform/models/domain/account";
 import { GlobalState } from "@bitwarden/common/platform/models/domain/global-state";
@@ -45,12 +46,14 @@ import { FileUploadService } from "@bitwarden/common/platform/services/file-uplo
 import { MemoryStorageService } from "@bitwarden/common/platform/services/memory-storage.service";
 import { NoopMessagingService } from "@bitwarden/common/platform/services/noop-messaging.service";
 import { StateService } from "@bitwarden/common/platform/services/state.service";
+import { GlobalStateProvider } from "@bitwarden/common/platform/state";
+// eslint-disable-next-line import/no-restricted-paths -- We need the implementation to inject, but generally this should not be accessed
+import { DefaultGlobalStateProvider } from "@bitwarden/common/platform/state/implementations/default-global-state.provider";
 import { AuditService } from "@bitwarden/common/services/audit.service";
 import { EventCollectionService } from "@bitwarden/common/services/event/event-collection.service";
 import { EventUploadService } from "@bitwarden/common/services/event/event-upload.service";
 import { SearchService } from "@bitwarden/common/services/search.service";
 import { SettingsService } from "@bitwarden/common/services/settings.service";
-import { TotpService } from "@bitwarden/common/services/totp.service";
 import { VaultTimeoutSettingsService } from "@bitwarden/common/services/vault-timeout/vault-timeout-settings.service";
 import { VaultTimeoutService } from "@bitwarden/common/services/vault-timeout/vault-timeout.service";
 import {
@@ -71,6 +74,7 @@ import { FolderApiService } from "@bitwarden/common/vault/services/folder/folder
 import { FolderService } from "@bitwarden/common/vault/services/folder/folder.service";
 import { SyncNotifierService } from "@bitwarden/common/vault/services/sync/sync-notifier.service";
 import { SyncService } from "@bitwarden/common/vault/services/sync/sync.service";
+import { TotpService } from "@bitwarden/common/vault/services/totp.service";
 import {
   VaultExportService,
   VaultExportServiceAbstraction,
@@ -161,6 +165,7 @@ export class Main {
   configApiService: ConfigApiServiceAbstraction;
   configService: CliConfigService;
   accountService: AccountService;
+  globalStateProvider: GlobalStateProvider;
 
   constructor() {
     let p = null;
@@ -200,7 +205,18 @@ export class Main {
 
     this.memoryStorageService = new MemoryStorageService();
 
-    this.accountService = new AccountServiceImplementation(null, this.logService);
+    this.globalStateProvider = new DefaultGlobalStateProvider(
+      this.memoryStorageService,
+      this.storageService
+    );
+
+    this.messagingService = new NoopMessagingService();
+
+    this.accountService = new AccountServiceImplementation(
+      this.messagingService,
+      this.logService,
+      this.globalStateProvider
+    );
 
     this.stateService = new StateService(
       this.storageService,
@@ -221,7 +237,6 @@ export class Main {
 
     this.appIdService = new AppIdService(this.storageService);
     this.tokenService = new TokenService(this.stateService);
-    this.messagingService = new NoopMessagingService();
     this.environmentService = new EnvironmentService(this.stateService);
 
     const customUserAgent =
@@ -428,6 +443,7 @@ export class Main {
       this.folderApiService,
       this.organizationService,
       this.sendApiService,
+      this.configService,
       async (expired: boolean) => await this.logout()
     );
 

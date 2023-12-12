@@ -315,6 +315,11 @@ export class BrowserApi {
     return chrome.runtime.sendMessage(message);
   }
 
+  static sendMessageWithResponse<TResponse>(subscriber: string, arg: any = {}) {
+    const message = Object.assign({}, { command: subscriber }, arg);
+    return new Promise<TResponse>((resolve) => chrome.runtime.sendMessage(message, resolve));
+  }
+
   static async focusTab(tabId: number) {
     chrome.tabs.update(tabId, { active: true, highlighted: true });
   }
@@ -334,7 +339,7 @@ export class BrowserApi {
     return process.env.ENV !== "production";
   }
 
-  static getUILanguage(win: Window) {
+  static getUILanguage() {
     return chrome.i18n.getUILanguage();
   }
 
@@ -369,9 +374,20 @@ export class BrowserApi {
     if (BrowserApi.isWebExtensionsApi) {
       return browser.permissions.request(permission);
     }
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       chrome.permissions.request(permission, resolve);
     });
+  }
+
+  /**
+   * Checks if the user has provided the given permissions to the extension.
+   *
+   * @param permissions - The permissions to check.
+   */
+  static async permissionsGranted(permissions: string[]): Promise<boolean> {
+    return new Promise((resolve) =>
+      chrome.permissions.contains({ permissions }, (result) => resolve(result))
+    );
   }
 
   static getPlatformInfo(): Promise<browser.runtime.PlatformInfo | chrome.runtime.PlatformInfo> {

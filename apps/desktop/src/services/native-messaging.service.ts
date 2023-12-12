@@ -1,8 +1,6 @@
 import { Injectable, NgZone } from "@angular/core";
-import { ipcRenderer } from "electron";
 import { firstValueFrom } from "rxjs";
 
-import { KeySuffixOptions } from "@bitwarden/common/enums";
 import { CryptoFunctionService } from "@bitwarden/common/platform/abstractions/crypto-function.service";
 import { CryptoService } from "@bitwarden/common/platform/abstractions/crypto.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
@@ -10,6 +8,7 @@ import { LogService } from "@bitwarden/common/platform/abstractions/log.service"
 import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { StateService } from "@bitwarden/common/platform/abstractions/state.service";
+import { KeySuffixOptions } from "@bitwarden/common/platform/enums";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
 import { EncString } from "@bitwarden/common/platform/models/domain/enc-string";
 import { SymmetricCryptoKey } from "@bitwarden/common/platform/models/domain/symmetric-crypto-key";
@@ -43,9 +42,7 @@ export class NativeMessagingService {
   ) {}
 
   init() {
-    ipcRenderer.on("nativeMessaging", async (_event: any, message: any) => {
-      this.messageHandler(message);
-    });
+    ipc.platform.nativeMessaging.onMessage((message) => this.messageHandler(message));
   }
 
   private async messageHandler(msg: LegacyMessageWrapper | Message) {
@@ -65,12 +62,18 @@ export class NativeMessagingService {
       const accounts = await firstValueFrom(this.stateService.accounts$);
       const userIds = Object.keys(accounts);
       if (!userIds.includes(rawMessage.userId)) {
-        ipcRenderer.send("nativeMessagingReply", { command: "wrongUserId", appId: appId });
+        ipc.platform.nativeMessaging.sendMessage({
+          command: "wrongUserId",
+          appId: appId,
+        });
         return;
       }
 
       if (await this.stateService.getEnableBrowserIntegrationFingerprint()) {
-        ipcRenderer.send("nativeMessagingReply", { command: "verifyFingerprint", appId: appId });
+        ipc.platform.nativeMessaging.sendMessage({
+          command: "verifyFingerprint",
+          appId: appId,
+        });
 
         const fingerprint = await this.cryptoService.getFingerprint(
           await this.stateService.getUserId(),
@@ -95,7 +98,10 @@ export class NativeMessagingService {
     }
 
     if (this.sharedSecrets.get(appId) == null) {
-      ipcRenderer.send("nativeMessagingReply", { command: "invalidateEncryption", appId: appId });
+      ipc.platform.nativeMessaging.sendMessage({
+        command: "invalidateEncryption",
+        appId: appId,
+      });
       return;
     }
 
@@ -105,7 +111,10 @@ export class NativeMessagingService {
 
     // Shared secret is invalidated, force re-authentication
     if (message == null) {
-      ipcRenderer.send("nativeMessagingReply", { command: "invalidateEncryption", appId: appId });
+      ipc.platform.nativeMessaging.sendMessage({
+        command: "invalidateEncryption",
+        appId: appId,
+      });
       return;
     }
 
@@ -116,8 +125,7 @@ export class NativeMessagingService {
 
     switch (message.command) {
       case "biometricUnlock": {
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        if (!this.platformUtilService.supportsBiometric()) {
+        if (!(await this.platformUtilService.supportsBiometric())) {
           return this.send({ command: "biometricUnlock", response: "not supported" }, appId);
         }
 
@@ -174,7 +182,7 @@ export class NativeMessagingService {
       this.sharedSecrets.get(appId)
     );
 
-    ipcRenderer.send("nativeMessagingReply", { appId: appId, message: encrypted });
+    ipc.platform.nativeMessaging.sendMessage({ appId: appId, message: encrypted });
   }
 
   private async secureCommunication(remotePublicKey: Uint8Array, appId: string) {
@@ -186,7 +194,7 @@ export class NativeMessagingService {
       remotePublicKey,
       EncryptionAlgorithm
     );
-    ipcRenderer.send("nativeMessagingReply", {
+    ipc.platform.nativeMessaging.sendMessage({
       appId: appId,
       command: "setupEncryption",
       sharedSecret: Utils.fromBufferToB64(encryptedSecret),

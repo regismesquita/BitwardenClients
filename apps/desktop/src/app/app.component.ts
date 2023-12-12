@@ -43,7 +43,7 @@ import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.servi
 import { CollectionService } from "@bitwarden/common/vault/abstractions/collection.service";
 import { InternalFolderService } from "@bitwarden/common/vault/abstractions/folder/folder.service.abstraction";
 import { SyncService } from "@bitwarden/common/vault/abstractions/sync/sync.service.abstraction";
-import { CipherType } from "@bitwarden/common/vault/enums/cipher-type";
+import { CipherType } from "@bitwarden/common/vault/enums";
 import { DialogService } from "@bitwarden/components";
 
 import { DeleteAccountComponent } from "../auth/delete-account.component";
@@ -537,6 +537,19 @@ export class AppComponent implements OnInit, OnDestroy {
       this.keyConnectorService.clear(),
     ]);
 
+    const preLogoutActiveUserId = this.activeUserId;
+    await this.stateService.clean({ userId: userBeingLoggedOut });
+
+    if (this.activeUserId == null) {
+      this.router.navigate(["login"]);
+    } else if (preLogoutActiveUserId !== this.activeUserId) {
+      this.messagingService.send("switchAccount");
+    }
+
+    await this.updateAppMenu();
+
+    // This must come last otherwise the logout will prematurely trigger
+    // a process reload before all the state service user data can be cleaned up
     if (userBeingLoggedOut === this.activeUserId) {
       this.searchService.clearIndex();
       this.authService.logOut(async () => {
@@ -549,17 +562,6 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       });
     }
-
-    const preLogoutActiveUserId = this.activeUserId;
-    await this.stateService.clean({ userId: userBeingLoggedOut });
-
-    if (this.activeUserId == null) {
-      this.router.navigate(["login"]);
-    } else if (preLogoutActiveUserId !== this.activeUserId) {
-      this.messagingService.send("switchAccount");
-    }
-
-    await this.updateAppMenu();
   }
 
   private async recordActivity() {

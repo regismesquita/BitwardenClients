@@ -10,6 +10,7 @@ import { StorageOptions } from "../src/platform/models/domain/storage-options";
 export class FakeStorageService implements AbstractStorageService {
   private store: Record<string, unknown>;
   private updatesSubject = new Subject<StorageUpdate>();
+  private _valuesRequireDeserialization = false;
 
   /**
    * Returns a mock of a {@see AbstractStorageService} for asserting the expected
@@ -32,6 +33,18 @@ export class FakeStorageService implements AbstractStorageService {
     this.store = store;
   }
 
+  get internalStore() {
+    return this.store;
+  }
+
+  internalUpdateValuesRequireDeserialization(value: boolean) {
+    this._valuesRequireDeserialization = value;
+  }
+
+  get valuesRequireDeserialization(): boolean {
+    return this._valuesRequireDeserialization;
+  }
+
   get updates$() {
     return this.updatesSubject.asObservable();
   }
@@ -46,15 +59,15 @@ export class FakeStorageService implements AbstractStorageService {
     return Promise.resolve(this.store[key] != null);
   }
   save<T>(key: string, obj: T, options?: StorageOptions): Promise<void> {
-    this.mock.save(key, options);
+    this.mock.save(key, obj, options);
     this.store[key] = obj;
-    this.updatesSubject.next({ key: key, value: obj, updateType: "save" });
+    this.updatesSubject.next({ key: key, updateType: "save" });
     return Promise.resolve();
   }
   remove(key: string, options?: StorageOptions): Promise<void> {
     this.mock.remove(key, options);
     delete this.store[key];
-    this.updatesSubject.next({ key: key, value: undefined, updateType: "remove" });
+    this.updatesSubject.next({ key: key, updateType: "remove" });
     return Promise.resolve();
   }
 }

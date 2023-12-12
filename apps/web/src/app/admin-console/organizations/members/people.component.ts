@@ -37,7 +37,9 @@ import {
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
 import { OrganizationKeysRequest } from "@bitwarden/common/admin-console/models/request/organization-keys.request";
 import { ProductType } from "@bitwarden/common/enums";
+import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ListResponse } from "@bitwarden/common/models/response/list.response";
+import { ConfigServiceAbstraction } from "@bitwarden/common/platform/abstractions/config/config.service.abstraction";
 import { CryptoService } from "@bitwarden/common/platform/abstractions/crypto.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
@@ -123,7 +125,8 @@ export class PeopleComponent
     dialogService: DialogService,
     private router: Router,
     private groupService: GroupService,
-    private collectionService: CollectionService
+    private collectionService: CollectionService,
+    private configService: ConfigServiceAbstraction
   ) {
     super(
       apiService,
@@ -241,8 +244,17 @@ export class PeopleComponent
       collectionsPromise,
     ]);
 
+    const flexibleCollectionsEnabled = await this.configService.getFeatureFlag(
+      FeatureFlag.FlexibleCollections,
+      false
+    );
+
     return usersResponse.data?.map<OrganizationUserView>((r) => {
       const userView = OrganizationUserView.fromResponse(r);
+
+      if (flexibleCollectionsEnabled) {
+        userView.accessAll = false;
+      }
 
       userView.groupNames = userView.groups
         .map((g) => groupNamesMap.get(g))
@@ -427,6 +439,15 @@ export class PeopleComponent
   }
 
   async edit(user: OrganizationUserView, initialTab: MemberDialogTab = MemberDialogTab.Role) {
+    if (!user && this.organization.hasReseller && this.organization.seats === this.confirmedCount) {
+      this.platformUtilsService.showToast(
+        "error",
+        this.i18nService.t("seatLimitReached"),
+        this.i18nService.t("contactYourProvider")
+      );
+      return;
+    }
+
     // Invite User: Add Flow
     // Click on user email: Edit Flow
 
@@ -450,6 +471,7 @@ export class PeopleComponent
         allOrganizationUserEmails: this.allUsers?.map((user) => user.email) ?? [],
         usesKeyConnector: user?.usesKeyConnector,
         initialTab: initialTab,
+        numConfirmedMembers: this.confirmedCount,
       },
     });
 
