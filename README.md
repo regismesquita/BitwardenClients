@@ -15,6 +15,7 @@ If you have any errors on the notorizing step it is no issue , as your dmg is al
 `$PROJECT_ROOT$/apps/desktop/dist/mac-universal/Bitwarden.app`
 All you got to do is copy to `/Applications/`
 
+IMPORTANT: I Am not a javascript developer, I am not familiar with electron , I just did some small changes and glued everything together so I was able to use the changes from the original PR locally, and I figured many would like to do the same. Use this AT YOUR OWN RISK.
 -------
 
 <p align="center">
