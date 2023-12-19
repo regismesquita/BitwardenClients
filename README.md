@@ -8,8 +8,11 @@ based on https://github.com/bitwarden/clients/pull/6375
 To build run:
 ```
 cd apps/desktop/
+npm run build
 npm run pack:mac
 ```
+
+Latest commit from original branch merged: `6199e585326949120350e396ab5bce64d64aba18`
 
 If you have any errors on the notorizing step it is no issue , as your dmg is already available at:
 `$PROJECT_ROOT$/apps/desktop/dist/mac-universal/Bitwarden.app`
