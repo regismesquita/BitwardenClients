@@ -430,7 +430,8 @@ function getBgService<T>(service: keyof MainBackground) {
         stateService: StateServiceAbstraction,
         organizationService: OrganizationService,
         folderService: FolderService,
-        policyService: PolicyService
+        policyService: PolicyService,
+        accountService: AccountServiceAbstraction,
       ) => {
         return new VaultFilterService(
           stateService,
@@ -438,10 +439,17 @@ function getBgService<T>(service: keyof MainBackground) {
           folderService,
           getBgService<CipherService>("cipherService")(),
           getBgService<CollectionService>("collectionService")(),
-          policyService
+          policyService,
+          accountService,
         );
       },
-      deps: [StateServiceAbstraction, OrganizationService, FolderService, PolicyService],
+      deps: [
+        StateServiceAbstraction,
+        OrganizationService,
+        FolderService,
+        PolicyService,
+        AccountServiceAbstraction,
+      ],
     },
     {
       provide: ProviderService,

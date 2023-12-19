@@ -25,6 +25,7 @@ export class DefaultGlobalState<T> implements GlobalState<T> {
   private storageUpdateSubscription: Subscription;
   private subscriberCount = new BehaviorSubject<number>(0);
   private stateObservable: Observable<T>;
+  private reinitialize = false;
 
   protected stateSubject: BehaviorSubject<T | typeof FAKE_DEFAULT> = new BehaviorSubject<
     T | typeof FAKE_DEFAULT
@@ -107,6 +108,12 @@ export class DefaultGlobalState<T> implements GlobalState<T> {
     return new Observable<T>((subscriber) => {
       this.incrementSubscribers();
 
+      // reinitialize listeners after cleanup
+      if (this.reinitialize) {
+        this.reinitialize = false;
+        this.initializeObservable();
+      }
+
       const prevUnsubscribe = subscriber.unsubscribe.bind(subscriber);
       subscriber.unsubscribe = () => {
         this.decrementSubscribers();
@@ -127,7 +134,9 @@ export class DefaultGlobalState<T> implements GlobalState<T> {
    */
   private async getStateForUpdate() {
     const currentValue = this.stateSubject.getValue();
-    return currentValue === FAKE_DEFAULT ? await this.getFromState() : currentValue;
+    return currentValue === FAKE_DEFAULT
+      ? await getStoredValue(this.storageKey, this.chosenLocation, this.keyDefinition.deserializer)
+      : currentValue;
   }
 
   async getFromState(): Promise<T> {
@@ -154,10 +163,10 @@ export class DefaultGlobalState<T> implements GlobalState<T> {
       if (this.subscriberCount.value === 0) {
         this.updatePromise = null;
         this.storageUpdateSubscription.unsubscribe();
-        this.stateObservable = null;
         this.subscriberCount.complete();
         this.subscriberCount = new BehaviorSubject<number>(0);
         this.stateSubject.next(FAKE_DEFAULT);
+        this.reinitialize = true;
       }
     }, this.keyDefinition.cleanupDelayMs);
   }

@@ -401,5 +401,23 @@ describe("DefaultSingleUserState", () => {
       expect(userState["stateSubject"].value).toEqual(newData); // digging in to check that it hasn't been cleared
       expect(userState["storageUpdateSubscription"]).not.toBeNull(); // still listening to storage updates
     });
+
+    it("state$ observables are durable to cleanup", async () => {
+      const observable = userState.state$;
+      let subscription = observable.subscribe();
+
+      await diskStorageService.save(userKey, newData);
+      await awaitAsync();
+
+      subscription.unsubscribe();
+      // Wait for cleanup
+      await awaitAsync(cleanupDelayMs * 2);
+
+      subscription = observable.subscribe();
+      await diskStorageService.save(userKey, newData);
+      await awaitAsync();
+
+      expect(await firstValueFrom(observable)).toEqual(newData);
+    });
   });
 });
