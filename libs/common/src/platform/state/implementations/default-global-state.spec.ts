@@ -403,5 +403,23 @@ describe("DefaultGlobalState", () => {
       expect(globalState["stateSubject"].value).toEqual(newData); // digging in to check that it hasn't been cleared
       expect(globalState["storageUpdateSubscription"]).not.toBeNull(); // still listening to storage updates
     });
+
+    it("state$ observables are durable to cleanup", async () => {
+      const observable = globalState.state$;
+      let subscription = observable.subscribe();
+
+      await diskStorageService.save(globalKey, newData);
+      await awaitAsync();
+
+      subscription.unsubscribe();
+      // Wait for cleanup
+      await awaitAsync(cleanupDelayMs * 2);
+
+      subscription = observable.subscribe();
+      await diskStorageService.save(globalKey, newData);
+      await awaitAsync();
+
+      expect(await firstValueFrom(observable)).toEqual(newData);
+    });
   });
 });

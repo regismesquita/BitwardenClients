@@ -36,6 +36,7 @@ export class DefaultActiveUserState<T> implements ActiveUserState<T> {
   private activeAccountUpdateSubscription: Subscription;
   private subscriberCount = new BehaviorSubject<number>(0);
   private stateObservable: Observable<T>;
+  private reinitialize = false;
 
   protected stateSubject: BehaviorSubject<T | typeof FAKE_DEFAULT> = new BehaviorSubject<
     T | typeof FAKE_DEFAULT
@@ -148,6 +149,12 @@ export class DefaultActiveUserState<T> implements ActiveUserState<T> {
     return new Observable<T>((subscriber) => {
       this.incrementSubscribers();
 
+      // reinitialize listeners after cleanup
+      if (this.reinitialize) {
+        this.reinitialize = false;
+        this.initializeObservable();
+      }
+
       const prevUnsubscribe = subscriber.unsubscribe.bind(subscriber);
       subscriber.unsubscribe = () => {
         this.decrementSubscribers();
@@ -207,10 +214,10 @@ export class DefaultActiveUserState<T> implements ActiveUserState<T> {
         this.updatePromise = null;
         this.storageUpdateSubscription?.unsubscribe();
         this.activeAccountUpdateSubscription?.unsubscribe();
-        this.stateObservable = null;
         this.subscriberCount.complete();
         this.subscriberCount = new BehaviorSubject<number>(0);
         this.stateSubject.next(FAKE_DEFAULT);
+        this.reinitialize = true;
       }
     }, this.keyDefinition.cleanupDelayMs);
   }
